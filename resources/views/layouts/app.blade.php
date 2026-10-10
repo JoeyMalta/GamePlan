@@ -1,12 +1,8 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" class="m-0 p-0">
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>@yield('title', 'Gameplan')</title>
 
@@ -16,11 +12,11 @@
     ])
 </head>
 
-<body class="min-h-screen bg-zinc-950 font-sans text-white">
+<body class="m-0 flex min-h-svh flex-col bg-white p-0 font-sans text-zinc-900">
 
 @include('partials.navbar')
 
-<main>
+<main class="flex min-h-0 flex-1">
     @yield('content')
 </main>
 

@@ -11,3 +11,11 @@
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
 }
+
+@layer base {
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+    }
+}

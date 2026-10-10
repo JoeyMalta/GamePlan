@@ -1,4 +1,4 @@
-﻿<nav class="border-b border-zinc-800 bg-zinc-950">
+<nav class="shrink-0 border-b border-zinc-800 bg-zinc-950">
     <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
 
         <!-- Logo -->
