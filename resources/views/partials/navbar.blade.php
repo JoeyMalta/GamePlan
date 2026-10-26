@@ -20,14 +20,14 @@
             </a>
 
             <a
-                href="/meetups"
+                href="/events"
                 class="text-sm font-medium text-zinc-300 transition hover:text-white"
             >
-                Meetups
+                Events
             </a>
 
             <a
-                href="/meetups/create"
+                href="/events/create"
                 class="text-sm font-medium text-zinc-300 transition hover:text-white"
             >
                 Organize
@@ -89,11 +89,11 @@
                 Home
             </a>
 
-            <a href="/meetups" class="text-sm font-medium text-zinc-300">
-                Meetups
+            <a href="/events" class="text-sm font-medium text-zinc-300">
+                Events
             </a>
 
-            <a href="/meetups/create" class="text-sm font-medium text-zinc-300">
+            <a href="/events/create" class="text-sm font-medium text-zinc-300">
                 Organize
             </a>
 
