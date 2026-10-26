@@ -1,32 +1,38 @@
 @props([
     'eyebrow' => 'Play. Meet. Connect.',
     'title' => 'Your next game starts here.',
-    'description' => 'Gameplan helps players discover local meetups, find new teammates, and turn a shared game into a real connection.',
+    'description' => 'Gameplan helps players discover local gaming events, find new teammates, and turn a shared game into a real connection.',
     'primaryLabel' => 'Plan Now',
-    'primaryHref' => '/meetups/create',
+    'primaryHref' => '/events/create',
     'secondaryLabel' => 'Learn More',
-    'secondaryHref' => '/meetups',
+    'secondaryHref' => '/events',
+
+    // Tijdelijke voorbeelddata. De keys volgen de kolommen uit de ERD (tabel events),
+    // zodat we dit later 1-op-1 kunnen vervangen door Event-models uit de database.
     'events' => [
         [
-            'date' => '9 Oct',
-            'time' => '19:30',
             'title' => 'Friday Night Ranked',
-            'meta' => 'Rotterdam · 8 spots left',
-            'tag' => 'Competitive',
+            'category' => 'Competitive',      // later: $event->category->name
+            'city' => 'Rotterdam',
+            'starts_at' => '2026-11-06 19:30',
+            'price' => 0,                     // 0 = gratis
+            'participants_count' => 8,        // later: telling uit event_user
         ],
         [
-            'date' => '16 Oct',
-            'time' => '20:00',
             'title' => 'Board Game Social',
-            'meta' => 'Rotterdam · 14 players',
-            'tag' => 'Social',
+            'category' => 'Social',
+            'city' => 'Rotterdam',
+            'starts_at' => '2026-11-13 20:00',
+            'price' => 5,
+            'participants_count' => 14,
         ],
         [
-            'date' => '23 Oct',
-            'time' => '19:00',
             'title' => 'Indie Co-op Evening',
-            'meta' => 'Delft · 6 spots left',
-            'tag' => 'Casual',
+            'category' => 'Casual',
+            'city' => 'Delft',
+            'starts_at' => '2026-11-20 19:00',
+            'price' => 0,
+            'participants_count' => 6,
         ],
     ],
 ])
@@ -96,28 +102,33 @@
 
             <div class="grid gap-3 md:grid-cols-3">
                 @foreach ($events as $event)
+                    @php
+                        $startsAt = \Illuminate\Support\Carbon::parse($event['starts_at']);
+                    @endphp
                     <a
                         href="{{ $secondaryHref }}"
                         class="group flex min-w-0 items-center gap-4 rounded-2xl border border-white/15 bg-zinc-950/55 p-4 shadow-xl shadow-black/25 backdrop-blur-xl transition hover:-translate-y-1 hover:border-violet-400/50 hover:bg-zinc-900/70"
                     >
                         <div class="flex size-14 shrink-0 flex-col items-center justify-center rounded-xl bg-violet-600 text-center text-white shadow-lg shadow-violet-950/30">
                             <span class="text-[0.65rem] font-bold uppercase leading-none tracking-wide">
-                                {{ $event['date'] }}
+                                {{ $startsAt->format('j M') }}
                             </span>
                             <span class="pt-1 text-xs font-semibold text-violet-100">
-                                {{ $event['time'] }}
+                                {{ $startsAt->format('H:i') }}
                             </span>
                         </div>
 
                         <div class="min-w-0 flex-1">
                             <span class="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-violet-300">
-                                {{ $event['tag'] }}
+                                {{ $event['category'] }}
                             </span>
                             <h3 class="truncate text-base font-semibold text-white group-hover:text-violet-200">
                                 {{ $event['title'] }}
                             </h3>
                             <p class="truncate text-xs text-zinc-400">
-                                {{ $event['meta'] }}
+                                {{ $event['city'] }}
+                                · {{ $event['participants_count'] }} players
+                                · {{ $event['price'] == 0 ? 'Free' : '€' . number_format($event['price'], 2, ',', '.') }}
                             </p>
                         </div>
 
