@@ -17,6 +17,13 @@
             <a href="/events/create" class="text-sm font-medium transition {{ request()->is('events/create') ? 'text-white' : 'text-zinc-300 hover:text-white' }}">
                 Organize
             </a>
+
+            {{-- Alleen zichtbaar voor admins. role-kolom komt uit de users-migration --}}
+            @if (auth()->user()?->role === 'admin')
+                <a href="/admin/users" class="text-sm font-medium transition {{ request()->is('admin/*') ? 'text-violet-300' : 'text-violet-400 hover:text-violet-300' }}">
+                    Admin
+                </a>
+            @endif
         </div>
 
         <!-- Account (desktop) -->
@@ -33,7 +40,7 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('dashboard')">Dashboard</x-dropdown-link>
+                        <x-dropdown-link :href="route('dashboard')">My events</x-dropdown-link>
                         <x-dropdown-link :href="route('profile.edit')">Profile</x-dropdown-link>
 
                         <form method="POST" action="{{ route('logout') }}">
@@ -75,11 +82,14 @@
             <a href="/" class="text-sm font-medium text-zinc-300">Home</a>
             <a href="/events" class="text-sm font-medium text-zinc-300">Events</a>
             <a href="/events/create" class="text-sm font-medium text-zinc-300">Organize</a>
+            @if (auth()->user()?->role === 'admin')
+                <a href="/admin/users" class="text-sm font-medium text-violet-400">Admin</a>
+            @endif
 
             <div class="mt-2 border-t border-zinc-800 pt-4">
                 @auth
                     <p class="pb-2 text-sm font-semibold text-white">{{ Auth::user()->name }}</p>
-                    <a href="{{ route('dashboard') }}" class="block py-2 text-sm font-medium text-zinc-300">Dashboard</a>
+                    <a href="{{ route('dashboard') }}" class="block py-2 text-sm font-medium text-zinc-300">My events</a>
                     <a href="{{ route('profile.edit') }}" class="block py-2 text-sm font-medium text-zinc-300">Profile</a>
 
                     <form method="POST" action="{{ route('logout') }}">

@@ -20,6 +20,8 @@
             </header>
         @endisset
 
+        <x-flash />
+
         <main class="flex-1">
             {{ $slot }}
         </main>
