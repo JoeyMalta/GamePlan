@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>@yield('title', 'Gameplan')</title>
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
 
     @vite([
         'resources/css/app.css',

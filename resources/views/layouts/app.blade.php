@@ -6,6 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Gameplan') }}</title>
+        <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>

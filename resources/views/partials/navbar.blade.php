@@ -2,8 +2,9 @@
     <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
 
         <!-- Logo -->
-        <a href="/" class="text-2xl font-bold tracking-tight text-white">
-            Game<span class="text-violet-500">plan</span>
+        <a href="/" class="flex items-center gap-2.5 text-2xl font-bold tracking-tight text-white">
+            <img src="{{ asset('favicon.svg') }}" alt="" class="size-8">
+            <span>Game<span class="text-violet-500">plan</span></span>
         </a>
 
         <!-- Desktop navigation -->
