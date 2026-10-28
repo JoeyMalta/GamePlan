@@ -26,6 +26,9 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        // Sla elke login op in de tabel logins (nodig voor de regel: 3 verschillende inlogdagen)
+        $request->user()->logins()->create();
+
         $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard', absolute: false));
