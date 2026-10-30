@@ -2,10 +2,10 @@
 @props(['event'])
 
 @php
-    // Eerste geüploade foto (opgeslagen met storePublicly in storage/app/public),
+    // Eerste geüploade foto. Storage::disk('public')->url() maakt de URL: lokaal /storage/..., in productie de bucket-URL.
     // anders een standaardafbeelding uit resources/images.
     $image = $event->images->first();
-    $imageUrl = $image ? asset('storage/' . $image->path) : Vite::asset('resources/images/gameplan-hero.png');
+    $imageUrl = $image ? Storage::disk('public')->url($image->path) : Vite::asset('resources/images/gameplan-hero.png');
 @endphp
 
 <a href="{{ route('events.show', $event) }}"

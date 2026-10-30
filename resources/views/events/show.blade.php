@@ -2,9 +2,9 @@
     {{-- Data komt uit EventController@show: $event (met category, user, images, participants),
          $isOwner, $isAdmin en $isParticipant --}}
     @php
-        // Geüploade foto's staan in storage/app/public en zijn bereikbaar via /storage (php artisan storage:link)
+        // Storage::disk('public')->url(): lokaal /storage/... (storage:link), op Laravel Cloud de URL van de bucket
         $images = $event->images;
-        $coverUrl = $images->isNotEmpty() ? asset('storage/' . $images->first()->path) : Vite::asset('resources/images/gameplan-hero.png');
+        $coverUrl = $images->isNotEmpty() ? Storage::disk('public')->url($images->first()->path) : Vite::asset('resources/images/gameplan-hero.png');
     @endphp
 
     <div class="mx-auto max-w-7xl px-6 py-10">
@@ -26,7 +26,7 @@
                 @if ($images->count() > 1)
                     <div class="mt-3 grid grid-cols-4 gap-3">
                         @foreach ($images->skip(1) as $image)
-                            <img src="{{ asset('storage/' . $image->path) }}" alt="" class="aspect-[4/3] w-full rounded-xl border border-zinc-800 object-cover">
+                            <img src="{{ Storage::disk('public')->url($image->path) }}" alt="" class="aspect-[4/3] w-full rounded-xl border border-zinc-800 object-cover">
                         @endforeach
                     </div>
                 @endif

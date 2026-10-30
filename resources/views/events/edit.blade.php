@@ -21,7 +21,7 @@
                         <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
                             @foreach ($event->images as $image)
                                 <label class="group relative block cursor-pointer overflow-hidden rounded-xl border border-zinc-800">
-                                    <img src="{{ asset('storage/' . $image->path) }}" alt="" class="aspect-[4/3] w-full object-cover">
+                                    <img src="{{ Storage::disk('public')->url($image->path) }}" alt="" class="aspect-[4/3] w-full object-cover">
                                     <span class="absolute inset-x-0 bottom-0 flex items-center gap-2 bg-zinc-950/80 px-3 py-2 text-xs text-zinc-300">
                                         <input type="checkbox" name="remove_images[]" value="{{ $image->id }}"
                                                class="size-4 rounded border-zinc-600 bg-zinc-950 text-red-600 focus:ring-red-500 focus:ring-offset-zinc-900">

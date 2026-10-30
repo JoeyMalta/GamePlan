@@ -1,58 +1,76 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Gameplan
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+> **TODO (Joey): schrijf hier in je eigen woorden 3–5 zinnen over Gameplan.**
+> Bijvoorbeeld: wat is het, voor wie is het, en waarom heb je dit onderwerp gekozen.
 
-## About Laravel
+Schoolproject voor CMTPRG02-5 *Web Application Frameworks* (Hogeschool Rotterdam), gebouwd met Laravel.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Techniek
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Laravel 13 (PHP 8.3 of hoger)
+- Laravel Breeze (Blade) voor inloggen, registreren en profiel
+- Tailwind CSS 4 en Alpine.js, gebouwd met Vite
+- SQLite als database (lokaal)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Installatie (lokaal)
 
 ```bash
-composer require laravel/boost --dev
+git clone https://github.com/JoeyMalta/GamePlan.git
+cd GamePlan
 
-php artisan boost:install
+composer install
+cp .env.example .env
+php artisan key:generate
+
+php artisan migrate:fresh --seed   # maakt de database en vult hem met demo-data
+php artisan storage:link           # maakt geüploade foto's bereikbaar via /storage
+
+npm install
+npm run build
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Daarna draait de site via Laravel Herd (bijvoorbeeld `https://gameplan.test`) of met `php artisan serve`.
 
-## Contributing
+## Demo-accounts
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Alle accounts hebben het wachtwoord `password`.
 
-## Code of Conduct
+| Rol | E-mail | Bijzonderheid |
+|---|---|---|
+| Admin | `admin@gameplan.test` | toegang tot `/admin` |
+| Gebruiker | `sam@gameplan.test` | heeft op 3 verschillende dagen ingelogd → mag events aanmaken |
+| Gebruiker | `lisa@gameplan.test` | heeft op 1 dag ingelogd → mag nog geen events aanmaken |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Functionaliteit en waar het in de code staat
 
-## Security Vulnerabilities
+| Eis | Waar |
+|---|---|
+| Inloggen / registreren | Laravel Breeze (`routes/auth.php`) |
+| Alleen voor ingelogde gebruikers | `middleware('auth')` in `routes/web.php` |
+| Rollen (admin / gebruiker) | kolom `users.role`, `User::isAdmin()`, middleware `EnsureUserIsAdmin` |
+| Alleen de maker (of admin) mag een event wijzigen of verwijderen | `EventController::authorizeOwnerOrAdmin()` |
+| Eigen gegevens aanpassen | `/profile` (Breeze) |
+| Validatie | `EventController::rules()` |
+| Zoeken en filteren | `EventController::index()` |
+| Status-toggles via POST | `Admin\UserController::toggleActive()`, `Admin\EventController::toggleCancelled()` |
+| Diepere validatie: pas na 3 verschillende inlogdagen een event aanmaken | `User::loginDays()` en `User::canCreateEvents()` |
+| Gedeactiveerde gebruikers blokkeren | `LoginRequest::authenticate()` en middleware `EnsureUserIsActive` |
+| Deelnemen aan events (veel-op-veel) | `EventController::join()` / `leave()`, tussentabel `event_user` |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Database
 
-## License
+Het ERD staat in `docs/gameplan-erd.png` (bron: `docs/gameplan-erd.dbml`, te openen op dbdiagram.io).
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Changelog
+
+Zie [CHANGELOG.md](CHANGELOG.md).
+
+## Bronnen
+
+- Foto's van de demo-events: [Unsplash](https://unsplash.com/license)
+- [Laravel-documentatie](https://laravel.com/docs) en het lesmateriaal van CMTPRG02-5
+
+## AI-gebruik
+
+> **TODO (Joey): beschrijf hier zelf, eerlijk en concreet, waarvoor je AI hebt gebruikt.**
+> De cursushandleiding vraagt hierover transparantie. Noem bijvoorbeeld welke onderdelen je met hulp van AI hebt gemaakt, wat je zelf hebt geschreven, en hoe je hebt gecontroleerd dat je alles begrijpt.
