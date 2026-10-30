@@ -16,6 +16,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Event images now use the uploaded path from storage (`asset('storage/' . $path)`) with the hero image as fallback.
 - Kept the `event_images` table so an event can have multiple location photos (decided against a single `image` column: more useful, and no ERD change needed).
 
+### Removed
+- **Laravel Boost** (`composer remove laravel/boost --dev`) and the files it generated for AI coding tools (`AGENTS.md`, `CLAUDE.md`, `boost.json`, `.mcp.json`, `.ai/`, `.agents/`, `.claude/`, `.junie/`). Boost isn't needed for the app itself; removed after feedback on the research report.
+- Unused files: old `public/favicon.svg` and `public/images/` (moved to `resources/images`), Breeze's `layouts/navigation.blade.php` (replaced by the Gameplan navbar), empty `state/` folder and the `Claude outputs` work folder.
+
+### Security
+- Ran `composer audit` and found **CVE-2026-45070** in `symfony/mime` (email header injection, medium severity — OWASP *Injection*). Updated only that package with `composer update symfony/mime --with-dependencies`; `composer audit` now reports no advisories.
+
 ## 2026-10-29
 
 ### Added
