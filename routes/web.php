@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EventController;
 
 Route::get('/', function () {
     return view('home');
@@ -28,7 +29,7 @@ Route::middleware('auth')->group(function () {
 | LET OP de volgorde: /events/create moet VÓÓR /events/{event} staan,
 | anders denkt Laravel dat "create" het {event} is.
 */
-Route::view('/events', 'events.index')->name('events.index');
+Route::get('/events', [EventController::class, 'index'])->name('events.index');
 
 Route::view('/events/create', 'events.create')
     ->middleware('auth')

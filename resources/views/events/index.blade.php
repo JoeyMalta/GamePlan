@@ -1,22 +1,5 @@
 <x-app-layout>
-    @php
-        // TIJDELIJKE VOORBEELDDATA — straks komt dit uit de EventController:
-        //   $events     = Event::with('category')->withCount('participants')->...->get();
-        //   $categories = Category::orderBy('name')->get();
-        //   $cities     = Event::distinct()->orderBy('city')->pluck('city');
-        // De keys volgen de kolommen uit de ERD.
-        $categories = [1 => 'Competitive', 2 => 'Social', 3 => 'Casual', 4 => 'Tabletop', 5 => 'LAN party'];
-        $cities = ['Delft', 'Rotterdam', 'Schiedam'];
-
-        $events = [
-            ['id' => 1, 'title' => 'Friday Night Ranked', 'category' => 'Competitive', 'city' => 'Rotterdam', 'starts_at' => '2026-11-06 19:30', 'price' => 0, 'participants_count' => 8, 'is_cancelled' => false, 'image' => null],
-            ['id' => 2, 'title' => 'Board Game Social', 'category' => 'Social', 'city' => 'Rotterdam', 'starts_at' => '2026-11-13 20:00', 'price' => 5, 'participants_count' => 14, 'is_cancelled' => false, 'image' => null],
-            ['id' => 3, 'title' => 'Indie Co-op Evening', 'category' => 'Casual', 'city' => 'Delft', 'starts_at' => '2026-11-20 19:00', 'price' => 0, 'participants_count' => 6, 'is_cancelled' => false, 'image' => null],
-            ['id' => 4, 'title' => 'Catan Tournament', 'category' => 'Tabletop', 'city' => 'Schiedam', 'starts_at' => '2026-11-22 14:00', 'price' => 7.5, 'participants_count' => 16, 'is_cancelled' => false, 'image' => null],
-            ['id' => 5, 'title' => 'Retro LAN Weekend', 'category' => 'LAN party', 'city' => 'Rotterdam', 'starts_at' => '2026-11-28 12:00', 'price' => 15, 'participants_count' => 24, 'is_cancelled' => true, 'image' => null],
-            ['id' => 6, 'title' => 'Fighting Game Friday', 'category' => 'Competitive', 'city' => 'Delft', 'starts_at' => '2026-12-04 19:00', 'price' => 0, 'participants_count' => 10, 'is_cancelled' => false, 'image' => null],
-        ];
-    @endphp
+    {{-- Data komt uit EventController@index: $events, $categories en $cities --}}
 
     <x-slot name="header">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -61,8 +44,8 @@
                     <select id="category" name="category"
                             class="block w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3.5 py-2.5 text-sm text-white focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40">
                         <option value="">All categories</option>
-                        @foreach ($categories as $id => $name)
-                            <option value="{{ $id }}" @selected(request('category') == $id)>{{ $name }}</option>
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->id }}" @selected(request('category') == $category->id)>{{ $category->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -88,7 +71,7 @@
         </form>
 
         <p class="mt-8 text-sm text-zinc-400">
-            <span class="font-semibold text-white">{{ count($events) }}</span> events found
+            <span class="font-semibold text-white">{{ $events->count() }}</span> {{ Str::plural('event', $events->count()) }} found
         </p>
 
         <div class="mt-4 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
