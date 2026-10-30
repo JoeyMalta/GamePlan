@@ -63,9 +63,10 @@ $maxWidth = [
         <div class="absolute inset-0 bg-zinc-950/80"></div>
     </div>
 
+    {{-- relative z-10: venster BOVEN de donkere achtergrond (in Tailwind 4 doet "transform" dat niet meer vanzelf) --}}
     <div
         x-show="show"
-        class="mb-6 rounded-2xl border border-zinc-800 bg-zinc-900 overflow-hidden shadow-xl transform transition-all sm:w-full {{ $maxWidth }} sm:mx-auto"
+        class="relative z-10 mt-[10vh] mb-6 rounded-2xl border border-zinc-800 bg-zinc-900 overflow-hidden shadow-xl transform transition-all sm:w-full {{ $maxWidth }} sm:mx-auto"
         x-transition:enter="ease-out duration-300"
         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"

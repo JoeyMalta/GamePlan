@@ -1,0 +1,76 @@
+// GamePlan - ERD
+// Plak deze code op https://dbdiagram.io
+
+Table users {
+  id bigint [pk, increment]
+  name varchar [not null]
+  email varchar [not null, unique]
+  email_verified_at timestamp [null]
+  password varchar [not null]
+  role varchar [not null, default: 'user', note: 'user of admin']
+  is_active boolean [not null, default: true]
+  remember_token varchar [null]
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp [null, note: 'soft delete']
+}
+
+Table categories {
+  id bigint [pk, increment]
+  name varchar [not null, unique]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table events {
+  id bigint [pk, increment]
+  user_id bigint [not null, note: 'maker van het event']
+  category_id bigint [not null]
+  title varchar [not null]
+  description text [not null]
+  city varchar [not null]
+  address varchar [not null]
+  starts_at datetime [not null]
+  price decimal(8,2) [not null, default: 0, note: '0 = gratis']
+  is_cancelled boolean [not null, default: false]
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp [null, note: 'soft delete']
+}
+
+Table event_images {
+  id bigint [pk, increment]
+  event_id bigint [not null]
+  path varchar [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table event_user {
+  id bigint [pk, increment]
+  event_id bigint [not null]
+  user_id bigint [not null]
+  created_at timestamp [note: 'moment van aanmelden']
+  updated_at timestamp
+
+  indexes {
+    (event_id, user_id) [unique]
+  }
+}
+
+Table logins {
+  id bigint [pk, increment]
+  user_id bigint [not null]
+  created_at timestamp [note: 'moment van inloggen']
+  updated_at timestamp
+}
+
+// 1-op-veel
+Ref: events.user_id > users.id [delete: restrict]
+Ref: events.category_id > categories.id [delete: restrict]
+Ref: event_images.event_id > events.id [delete: cascade]
+Ref: logins.user_id > users.id [delete: cascade]
+
+// veel-op-veel (users <-> events) via tussentabel event_user
+Ref: event_user.event_id > events.id [delete: cascade]
+Ref: event_user.user_id > users.id [delete: cascade]

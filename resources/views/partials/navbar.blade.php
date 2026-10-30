@@ -20,7 +20,7 @@
             </a>
 
             {{-- Alleen zichtbaar voor admins. role-kolom komt uit de users-migration --}}
-            @if (auth()->user()?->role === 'admin')
+            @if (auth()->user()?->isAdmin())
                 <a href="/admin/users" class="text-sm font-medium transition {{ request()->is('admin/*') ? 'text-violet-300' : 'text-violet-400 hover:text-violet-300' }}">
                     Admin
                 </a>
@@ -83,7 +83,7 @@
             <a href="/" class="text-sm font-medium text-zinc-300">Home</a>
             <a href="/events" class="text-sm font-medium text-zinc-300">Events</a>
             <a href="/events/create" class="text-sm font-medium text-zinc-300">Organize</a>
-            @if (auth()->user()?->role === 'admin')
+            @if (auth()->user()?->isAdmin())
                 <a href="/admin/users" class="text-sm font-medium text-violet-400">Admin</a>
             @endif
 
