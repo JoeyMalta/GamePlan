@@ -25,22 +25,13 @@ class DatabaseSeeder extends Seeder
             $categories[$name] = Category::create(['name' => $name]);
         }
 
-        // 2. Demo-accounts (wachtwoord van allemaal: "password", komt uit de UserFactory)
-        $admin = User::factory()->create([
-            'name' => 'Admin',
-            'email' => 'admin@gameplan.test',
-            'role' => 'admin',
-        ]);
-
-        $sam = User::factory()->create([
-            'name' => 'Sam de Vries',
-            'email' => 'sam@gameplan.test',
-        ]);
-
-        $lisa = User::factory()->create([
-            'name' => 'Lisa Bakker',
-            'email' => 'lisa@gameplan.test',
-        ]);
+        // 2. Demo-accounts (wachtwoord van allemaal: "password").
+        //    Bewust zonder de UserFactory: die gebruikt Faker, en Faker staat in require-dev.
+        //    In productie (composer install --no-dev) bestaat Faker niet, dan zou de seeder crashen.
+        //    forceCreate omdat 'role' bewust niet in Fillable staat; het wachtwoord wordt gehasht door de cast 'hashed'.
+        $admin = $this->createUser('Admin', 'admin@gameplan.test', 'admin');
+        $sam = $this->createUser('Sam de Vries', 'sam@gameplan.test');
+        $lisa = $this->createUser('Lisa Bakker', 'lisa@gameplan.test');
 
         // 3. Login-geschiedenis (voor de regel: 3 verschillende inlogdagen)
         //    Sam: 3 verschillende dagen → mag events maken
@@ -119,6 +110,20 @@ class DatabaseSeeder extends Seeder
         $ranked->participants()->attach([$lisa->id, $admin->id]);
         $boardGames->participants()->attach([$lisa->id]);
         $coop->participants()->attach([$sam->id, $lisa->id]);
+    }
+
+    /**
+     * Maakt een demo-account aan met wachtwoord "password".
+     */
+    private function createUser(string $name, string $email, string $role = 'user'): User
+    {
+        return User::forceCreate([
+            'name' => $name,
+            'email' => $email,
+            'password' => 'password',
+            'role' => $role,
+            'email_verified_at' => now(),
+        ]);
     }
 
     /**
