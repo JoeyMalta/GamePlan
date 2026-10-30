@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['title', 'description', 'category_id', 'starts_at', 'city', 'address', 'price'])]
 class Event extends Model
@@ -37,6 +38,10 @@ class Event extends Model
         return $this->belongsToMany(User::class)->withTimestamps();
     }
 
+    public function images(): HasMany
+    {
+        return $this->hasMany(EventImage::class);
+    }
 
 }
 
