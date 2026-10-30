@@ -174,6 +174,36 @@ class EventController extends Controller
     }
 
     /**
+     * Deelnemen aan een event: een rij toevoegen in de tussentabel event_user.
+     */
+    public function join(Request $request, Event $event): RedirectResponse
+    {
+        // Afgezegde of verlopen events: niet meer deelnemen
+        if ($event->is_cancelled || $event->starts_at->isPast()) {
+            return back()->with('error', 'You can no longer join this event.');
+        }
+
+        // Al deelnemer? Dan niet nog een keer (de unique-index zou anders een fout geven)
+        if ($event->participants()->where('user_id', $request->user()->id)->exists()) {
+            return back()->with('error', 'You already joined this event.');
+        }
+
+        $event->participants()->attach($request->user()->id);
+
+        return back()->with('success', 'You joined "' . $event->title . '". See you there!');
+    }
+
+    /**
+     * Afmelden: de rij in event_user weer verwijderen.
+     */
+    public function leave(Request $request, Event $event): RedirectResponse
+    {
+        $event->participants()->detach($request->user()->id);
+
+        return back()->with('success', 'You left "' . $event->title . '".');
+    }
+
+    /**
      * AUTORISATIE: alleen de maker van het event of een admin mag verder, anders 403.
      * (OWASP A01: Broken Access Control — ook bij deeplinken naar /events/{id}/edit)
      */

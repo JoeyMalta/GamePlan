@@ -5,14 +5,13 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('home');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -37,6 +36,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
     Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
     Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
+    Route::post('/events/{event}/join', [EventController::class, 'join'])->name('events.join');
+    Route::delete('/events/{event}/leave', [EventController::class, 'leave'])->name('events.leave');
 });
 
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');

@@ -63,16 +63,16 @@
 
                     <div class="mt-6 border-t border-zinc-800 pt-6">
                         @auth
-                            @unless ($event->is_cancelled)
+                            @unless ($event->is_cancelled || $event->starts_at->isPast())
                                 {{-- Deelnemen/afmelden = rij toevoegen/verwijderen in event_user --}}
                                 @if ($isParticipant)
-                                    <form method="POST" action="/events/{{ $event->id }}/leave">
+                                    <form method="POST" action="{{ route('events.leave', $event) }}">
                                         @csrf
                                         @method('DELETE')
                                         <x-secondary-button type="submit" class="w-full">Leave event</x-secondary-button>
                                     </form>
                                 @else
-                                    <form method="POST" action="/events/{{ $event->id }}/join">
+                                    <form method="POST" action="{{ route('events.join', $event) }}">
                                         @csrf
                                         <x-primary-button class="w-full">Join event</x-primary-button>
                                     </form>
@@ -117,7 +117,7 @@
                                     </a>
 
                                     {{-- D van CRUD: DELETE naar EventController@destroy (soft delete) --}}
-                                    <form method="POST" action="/events/{{ $event->id }}" onsubmit="return confirm('Delete this event?')">
+                                    <form method="POST" action="{{ route('events.destroy', $event) }}" onsubmit="return confirm('Delete this event?')">
                                         @csrf
                                         @method('DELETE')
                                         <x-danger-button class="w-full">Delete event</x-danger-button>
@@ -126,7 +126,7 @@
 
                                 @if ($isAdmin)
                                     {{-- Zelfde toggle-actie als in de adminlijst --}}
-                                    <form method="POST" action="/admin/events/{{ $event->id }}/toggle-cancelled">
+                                    <form method="POST" action="{{ route('admin.events.toggle-cancelled', $event) }}">
                                         @csrf
                                         <x-secondary-button type="submit" class="w-full">
                                             {{ $event->is_cancelled ? 'Reinstate event' : 'Cancel event (admin)' }}
