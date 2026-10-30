@@ -1,12 +1,6 @@
 <x-app-layout>
-    @php
-        // TIJDELIJK: straks bepaalt de controller dit met een losse Eloquent-query, bijv.:
-        //   $loginDays = $user->logins()->selectRaw('DATE(created_at)')->distinct()->count();
-        //   $canCreate = $loginDays >= 3;
-        // Zet $loginDays op 1 om het "vergrendelde" scherm te bekijken.
-        $loginDays = 3;
-        $canCreate = $loginDays >= 3;
-    @endphp
+    {{-- Data komt uit EventController@create:
+         $canCreate (bool), $loginDays (int, uit de Eloquent-query), $requiredDays (3) en $categories --}}
 
     <x-slot name="header">
         <p class="text-xs font-semibold uppercase tracking-[0.22em] text-violet-300">Organize</p>
@@ -16,12 +10,12 @@
     <div class="mx-auto max-w-7xl px-6 py-10">
         @if ($canCreate)
             {{-- enctype="multipart/form-data" is VERPLICHT als je bestanden (afbeeldingen) wilt uploaden --}}
-            <form method="POST" action="/events" enctype="multipart/form-data"
+            <form method="POST" action="{{ route('events.store') }}" enctype="multipart/form-data"
                   class="rounded-2xl border border-zinc-800 bg-zinc-900 p-6 sm:p-8">
                 @csrf {{-- beschermt tegen CSRF-aanvallen (OWASP) --}}
 
                 <div class="max-w-3xl">
-                    @include('events.partials.form', ['event' => null])
+                    @include('events.partials.form', ['event' => null, 'categories' => $categories])
 
                     <div class="mt-8 flex items-center gap-3 border-t border-zinc-800 pt-6">
                         <x-primary-button>Publish event</x-primary-button>
@@ -36,16 +30,16 @@
                 <h3 class="mt-5 text-lg font-semibold text-white">Almost there!</h3>
                 <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-400">
                     To keep Gameplan safe, you can organize events after logging in on
-                    <span class="font-semibold text-white">3 different days</span>.
+                    <span class="font-semibold text-white">{{ $requiredDays }} different days</span>.
                 </p>
 
                 <div class="mx-auto mt-6 max-w-xs">
                     <div class="flex justify-between text-xs font-medium text-zinc-400">
                         <span>Progress</span>
-                        <span>{{ $loginDays }} / 3 days</span>
+                        <span>{{ min($loginDays, $requiredDays) }} / {{ $requiredDays }} days</span>
                     </div>
                     <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-800">
-                        <div class="h-full rounded-full bg-violet-600" style="width: {{ min(100, $loginDays / 3 * 100) }}%"></div>
+                        <div class="h-full rounded-full bg-violet-600" style="width: {{ min(100, $loginDays / $requiredDays * 100) }}%"></div>
                     </div>
                 </div>
 

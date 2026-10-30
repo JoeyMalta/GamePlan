@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EventController;
 
 Route::get('/', function () {
     return view('home');
@@ -20,35 +20,28 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Events — TIJDELIJK (alleen de views tonen)
+| Events
 |--------------------------------------------------------------------------
-| Route::view() koppelt een URL direct aan een view, zonder controller.
-| Zodra de backend er is, vervangen we dit door een EventController:
-|   Route::resource('events', EventController::class);
-|
 | LET OP de volgorde: /events/create moet VÓÓR /events/{event} staan,
 | anders denkt Laravel dat "create" het {event} is.
 */
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
 
-Route::view('/events/create', 'events.create')
-    ->middleware('auth')
-    ->name('events.create');
+// Alleen voor ingelogde gebruikers (middleware 'auth')
+Route::middleware('auth')->group(function () {
+    Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
+    Route::post('/events', [EventController::class, 'store'])->name('events.store');
+});
 
-Route::view('/events/{event}', 'events.show')->name('events.show');
+Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 
+// TIJDELIJK: wordt in de volgende stap EventController@edit
 Route::view('/events/{event}/edit', 'events.edit')
     ->middleware('auth')
     ->name('events.edit');
 
 /*
-| Admin — TIJDELIJK. Straks:
-|   Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-|       Route::get('/users', [Admin\UserController::class, 'index'])->name('users.index');
-|       Route::post('/users/{user}/toggle-active', [Admin\UserController::class, 'toggleActive'])->name('users.toggle');
-|       ...
-|   });
-| De 'admin'-middleware maken we zelf: die laat alleen gebruikers met role = admin door.
+| Admin — TIJDELIJK. Straks met eigen 'admin'-middleware en controllers.
 */
 Route::middleware('auth')->prefix('admin')->group(function () {
     Route::view('/users', 'admin.users.index')->name('admin.users.index');
