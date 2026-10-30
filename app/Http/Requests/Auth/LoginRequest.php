@@ -50,6 +50,15 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Gedeactiveerd door een admin? Direct weer uitloggen en een melding tonen.
+        if (! Auth::user()->is_active) {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'email' => 'This account has been deactivated by an administrator.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\EventController as AdminEventController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -40,11 +42,18 @@ Route::middleware('auth')->group(function () {
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 
 /*
-| Admin — TIJDELIJK. Straks met eigen 'admin'-middleware en controllers.
+|--------------------------------------------------------------------------
+| Admin — alleen voor ingelogde admins (middleware 'auth' + 'admin')
+|--------------------------------------------------------------------------
+| prefix('admin')  → alle URL's beginnen met /admin
+| name('admin.')   → alle routenamen beginnen met admin.
 */
-Route::middleware('auth')->prefix('admin')->group(function () {
-    Route::view('/users', 'admin.users.index')->name('admin.users.index');
-    Route::view('/events', 'admin.events.index')->name('admin.events.index');
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::post('/users/{user}/toggle-active', [AdminUserController::class, 'toggleActive'])->name('users.toggle-active');
+
+    Route::get('/events', [AdminEventController::class, 'index'])->name('events.index');
+    Route::post('/events/{event}/toggle-cancelled', [AdminEventController::class, 'toggleCancelled'])->name('events.toggle-cancelled');
 });
 
 require __DIR__.'/auth.php';
