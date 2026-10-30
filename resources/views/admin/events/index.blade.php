@@ -1,13 +1,5 @@
 <x-app-layout>
-    @php
-        // TIJDELIJKE VOORBEELDDATA — straks in Admin\EventController@index:
-        //   $events = Event::with('user', 'category')->withCount('participants')->orderBy('starts_at')->get();
-        $events = [
-            ['id' => 1, 'title' => 'Friday Night Ranked', 'organizer' => 'JoeyMalta', 'category' => 'Competitive', 'city' => 'Rotterdam', 'starts_at' => '2026-11-06 19:30', 'participants_count' => 8, 'is_cancelled' => false],
-            ['id' => 2, 'title' => 'Board Game Social', 'organizer' => 'Sam de Vries', 'category' => 'Social', 'city' => 'Rotterdam', 'starts_at' => '2026-11-13 20:00', 'participants_count' => 14, 'is_cancelled' => false],
-            ['id' => 5, 'title' => 'Retro LAN Weekend', 'organizer' => 'Mo Haddou', 'category' => 'LAN party', 'city' => 'Rotterdam', 'starts_at' => '2026-11-28 12:00', 'participants_count' => 24, 'is_cancelled' => true],
-        ];
-    @endphp
+    {{-- Data komt uit Admin\EventController@index: $events (met user, category en participants_count) --}}
 
     <x-slot name="header">
         <p class="text-xs font-semibold uppercase tracking-[0.22em] text-violet-300">Admin</p>
@@ -33,36 +25,36 @@
                     @foreach ($events as $event)
                         <tr>
                             <td class="px-6 py-4">
-                                <a href="{{ route('events.show', $event['id']) }}" class="font-semibold text-white hover:text-violet-300 {{ $event['is_cancelled'] ? 'line-through opacity-60' : '' }}">
-                                    {{ $event['title'] }}
+                                <a href="{{ route('events.show', $event) }}" class="font-semibold text-white hover:text-violet-300 {{ $event->is_cancelled ? 'line-through opacity-60' : '' }}">
+                                    {{ $event->title }}
                                 </a>
-                                <p class="text-zinc-400">{{ $event['category'] }} · {{ $event['city'] }}</p>
+                                <p class="text-zinc-400">{{ $event->category->name }} · {{ $event->city }}</p>
                             </td>
-                            <td class="px-6 py-4 text-zinc-300">{{ $event['organizer'] }}</td>
-                            <td class="px-6 py-4 text-zinc-400">{{ \Illuminate\Support\Carbon::parse($event['starts_at'])->format('j M Y · H:i') }}</td>
-                            <td class="px-6 py-4 text-zinc-300">{{ $event['participants_count'] }}</td>
+                            <td class="px-6 py-4 text-zinc-300">{{ $event->user->name }}</td>
+                            <td class="px-6 py-4 text-zinc-400">{{ $event->starts_at->format('j M Y · H:i') }}</td>
+                            <td class="px-6 py-4 text-zinc-300">{{ $event->participants_count }}</td>
                             <td class="px-6 py-4">
                                 {{-- STATUS-TOGGLE (verplichte eis): knop in lijst, via POST, naar aparte actie
                                      Admin\EventController@toggleCancelled --}}
-                                <form method="POST" action="/admin/events/{{ $event['id'] }}/toggle-cancelled">
+                                <form method="POST" action="{{ route('admin.events.toggle-cancelled', $event) }}">
                                     @csrf
                                     <button type="submit"
-                                            class="inline-flex min-w-32 items-center justify-center gap-2 rounded-lg border px-4 py-2 text-xs font-bold uppercase tracking-wide transition {{ $event['is_cancelled'] ? 'border-red-900/60 bg-red-950/40 text-red-300 hover:bg-red-900/40' : 'border-green-800/60 bg-green-950/40 text-green-300 hover:bg-green-900/40' }}">
-                                        <span class="size-2 rounded-full {{ $event['is_cancelled'] ? 'bg-red-400' : 'bg-green-400' }}"></span>
-                                        {{ $event['is_cancelled'] ? 'Cancelled' : 'Scheduled' }}
+                                            class="inline-flex min-w-32 items-center justify-center gap-2 rounded-lg border px-4 py-2 text-xs font-bold uppercase tracking-wide transition {{ $event->is_cancelled ? 'border-red-900/60 bg-red-950/40 text-red-300 hover:bg-red-900/40' : 'border-green-800/60 bg-green-950/40 text-green-300 hover:bg-green-900/40' }}">
+                                        <span class="size-2 rounded-full {{ $event->is_cancelled ? 'bg-red-400' : 'bg-green-400' }}"></span>
+                                        {{ $event->is_cancelled ? 'Cancelled' : 'Scheduled' }}
                                     </button>
                                 </form>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-end gap-2">
                                     {{-- Admin mag elk event bewerken (moderator) --}}
-                                    <a href="{{ route('events.edit', $event['id']) }}"
+                                    <a href="{{ route('events.edit', $event) }}"
                                        class="rounded-lg border border-zinc-700 px-4 py-2 text-xs font-bold uppercase tracking-wide text-zinc-300 transition hover:border-zinc-500 hover:text-white">
                                         Edit
                                     </a>
 
                                     {{-- Verwijderen = soft delete via EventController@destroy --}}
-                                    <form method="POST" action="/events/{{ $event['id'] }}" onsubmit="return confirm('Delete this event?')">
+                                    <form method="POST" action="{{ route('events.destroy', $event) }}" onsubmit="return confirm('Delete this event?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"

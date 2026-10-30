@@ -27,18 +27,17 @@ Route::middleware('auth')->group(function () {
 */
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
 
-// Alleen voor ingelogde gebruikers (middleware 'auth')
+// Alleen voor ingelogde gebruikers (middleware 'auth').
+// Wie wat mag (maker/admin) wordt daarna in de controller gecontroleerd.
 Route::middleware('auth')->group(function () {
     Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
     Route::post('/events', [EventController::class, 'store'])->name('events.store');
+    Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
+    Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
+    Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
 });
 
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
-
-// TIJDELIJK: wordt in de volgende stap EventController@edit
-Route::view('/events/{event}/edit', 'events.edit')
-    ->middleware('auth')
-    ->name('events.edit');
 
 /*
 | Admin — TIJDELIJK. Straks met eigen 'admin'-middleware en controllers.

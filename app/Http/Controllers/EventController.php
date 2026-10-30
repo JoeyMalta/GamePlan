@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class EventController extends Controller
@@ -81,27 +82,15 @@ class EventController extends Controller
         }
 
         // 2. VALIDATIE (server-side): verplichte velden + controle op inhoud.
-        //    Gaat er iets mis, dan stuurt Laravel automatisch terug met $errors en old().
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'max:5000'],
-            'category_id' => ['required', 'exists:categories,id'],
-            'starts_at' => ['required', 'date', 'after:now'],
-            'city' => ['required', 'string', 'max:100'],
-            'address' => ['required', 'string', 'max:255'],
-            'price' => ['required', 'numeric', 'min:0', 'max:9999.99'],
-            'images' => ['nullable', 'array', 'max:5'],
-            'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        ]);
+        $validated = $request->validate($this->rules());
 
         // 3. Opslaan via de relatie: user_id wordt automatisch de ingelogde gebruiker
-        $event = $request->user()->events()->create($validated);
+        $event = $request->user()->events()->create(
+            collect($validated)->except('images')->all()
+        );
 
         // 4. Foto's opslaan (aanpak van Antwan: storePublicly + pad in de database)
-        foreach ($request->file('images', []) as $image) {
-            $path = $image->storePublicly('events', 'public');
-            $event->images()->create(['path' => $path]);
-        }
+        $this->storeImages($request, $event);
 
         return redirect()
             ->route('events.show', $event)
@@ -117,7 +106,8 @@ class EventController extends Controller
         // Relaties in één keer meeladen (eager loading)
         $event->load(['category', 'user', 'images', 'participants']);
 
-        // Bepalen wat de bezoeker mag zien (knoppen in de view)
+        // Bepalen wat de bezoeker mag zien (knoppen in de view) — dit is GEEN beveiliging,
+        // de echte controle zit in edit(), update() en destroy().
         $user = auth()->user();
         $isOwner = $user !== null && $user->id === $event->user_id;
         $isAdmin = $user !== null && $user->isAdmin();
@@ -127,26 +117,103 @@ class EventController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Formulier om een event te bewerken — alleen voor de maker of een admin.
      */
-    public function edit(string $id)
+    public function edit(Event $event): View
     {
-        //
+        $this->authorizeOwnerOrAdmin($event);
+
+        $event->load('images');
+
+        return view('events.edit', [
+            'event' => $event,
+            'categories' => Category::orderBy('name')->pluck('name', 'id'),
+        ]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Wijzigingen opslaan — alleen voor de maker of een admin.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Event $event): RedirectResponse
     {
-        //
+        // Ook hier controleren: iemand kan zelf een PUT-verzoek sturen zonder het formulier
+        $this->authorizeOwnerOrAdmin($event);
+
+        $validated = $request->validate($this->rules());
+
+        $event->update(collect($validated)->except('images')->all());
+
+        // Aangevinkte foto's verwijderen (bestand + rij in de database).
+        // Via $event->images() zodat je alleen foto's van DIT event kunt verwijderen.
+        $imagesToRemove = $event->images()->whereIn('id', $request->input('remove_images', []))->get();
+        foreach ($imagesToRemove as $image) {
+            Storage::disk('public')->delete($image->path);
+            $image->delete();
+        }
+
+        $this->storeImages($request, $event);
+
+        return redirect()
+            ->route('events.show', $event)
+            ->with('success', 'Your event has been updated.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Event verwijderen (soft delete) — alleen voor de maker of een admin.
      */
-    public function destroy(string $id)
+    public function destroy(Event $event): RedirectResponse
     {
-        //
+        $this->authorizeOwnerOrAdmin($event);
+
+        // Soft delete: vult deleted_at, de rij en alle koppelingen blijven bestaan
+        $event->delete();
+
+        return redirect()
+            ->route('events.index')
+            ->with('success', 'The event has been deleted.');
+    }
+
+    /**
+     * AUTORISATIE: alleen de maker van het event of een admin mag verder, anders 403.
+     * (OWASP A01: Broken Access Control — ook bij deeplinken naar /events/{id}/edit)
+     */
+    private function authorizeOwnerOrAdmin(Event $event): void
+    {
+        $user = auth()->user();
+
+        if ($user->id !== $event->user_id && ! $user->isAdmin()) {
+            abort(403);
+        }
+    }
+
+    /**
+     * Validatieregels voor aanmaken én bewerken (op één plek, DRY).
+     *
+     * @return array<string, array<int, string>>
+     */
+    private function rules(): array
+    {
+        return [
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:5000'],
+            'category_id' => ['required', 'exists:categories,id'],
+            'starts_at' => ['required', 'date', 'after:now'],
+            'city' => ['required', 'string', 'max:100'],
+            'address' => ['required', 'string', 'max:255'],
+            'price' => ['required', 'numeric', 'min:0', 'max:9999.99'],
+            'images' => ['nullable', 'array', 'max:5'],
+            'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ];
+    }
+
+    /**
+     * Geüploade foto's opslaan in storage/app/public/events en het pad in event_images zetten.
+     */
+    private function storeImages(Request $request, Event $event): void
+    {
+        foreach ($request->file('images', []) as $image) {
+            $path = $image->storePublicly('events', 'public');
+            $event->images()->create(['path' => $path]);
+        }
     }
 }
