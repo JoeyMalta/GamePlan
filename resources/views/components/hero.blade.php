@@ -43,7 +43,7 @@
     ]) }}
 >
     <img
-        src="{{ asset('images/gameplan-hero.png') }}"
+        src="{{ Vite::asset('resources/images/gameplan-hero.png') }}"
         alt=""
         class="absolute inset-0 -z-30 h-full w-full scale-[1.02] object-cover object-[62%_center]"
         fetchpriority="high"

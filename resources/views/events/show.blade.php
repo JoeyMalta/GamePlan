@@ -13,7 +13,8 @@
             'price' => 0,
             'is_cancelled' => false,
             'organizer' => 'JoeyMalta',
-            'images' => ['images/gameplan-hero.png', 'images/gameplan-hero.png', 'images/gameplan-hero.png'],
+            // Paden uit de tabel event_images (straks: $event->images->pluck('path'))
+            'images' => [],
             'participants' => ['Sam', 'Lisa', 'Mo', 'Noah', 'Eva', 'Daan', 'Yara', 'Finn'],
         ];
 
@@ -25,6 +26,10 @@
         $isAdmin = true;
 
         $startsAt = \Illuminate\Support\Carbon::parse($event['starts_at']);
+
+        // Geüploade foto's staan in storage/app/public en zijn bereikbaar via /storage (php artisan storage:link)
+        $images = $event['images'];
+        $coverUrl = count($images) ? asset('storage/' . $images[0]) : Vite::asset('resources/images/gameplan-hero.png');
     @endphp
 
     <div class="mx-auto max-w-7xl px-6 py-10">
@@ -40,13 +45,13 @@
             {{-- Linkerkolom: foto's + info --}}
             <div class="lg:col-span-2">
                 <div class="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
-                    <img src="{{ asset($event['images'][0]) }}" alt="" class="aspect-[16/9] w-full object-cover">
+                    <img src="{{ $coverUrl }}" alt="" class="aspect-[16/9] w-full object-cover">
                 </div>
 
-                @if (count($event['images']) > 1)
+                @if (count($images) > 1)
                     <div class="mt-3 grid grid-cols-4 gap-3">
-                        @foreach (array_slice($event['images'], 1) as $image)
-                            <img src="{{ asset($image) }}" alt="" class="aspect-[4/3] w-full rounded-xl border border-zinc-800 object-cover">
+                        @foreach (array_slice($images, 1) as $image)
+                            <img src="{{ asset('storage/' . $image) }}" alt="" class="aspect-[4/3] w-full rounded-xl border border-zinc-800 object-cover">
                         @endforeach
                     </div>
                 @endif
@@ -127,7 +132,8 @@
                         <div class="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
                             <h3 class="text-sm font-semibold text-white">Manage</h3>
                             <div class="mt-4 flex flex-col gap-3">
-                                @if ($isOwner)
+                                {{-- Maker mag zijn eigen event wijzigen/verwijderen; admin mag dat bij alle events (moderator) --}}
+                                @if ($isOwner || $isAdmin)
                                     <a href="{{ route('events.edit', $event['id']) }}"
                                        class="inline-flex w-full items-center justify-center rounded-lg border border-zinc-700 px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-zinc-200 transition hover:border-zinc-500 hover:text-white">
                                         Edit event

@@ -3,13 +3,19 @@
 
 @php
     $startsAt = \Illuminate\Support\Carbon::parse($event['starts_at']);
+
+    // Eerste geüploade foto (opgeslagen met storePublicly in storage/app/public),
+    // anders een standaardafbeelding uit resources/images.
+    // Straks met een model: $event->images->first()?->path
+    $image = $event['image'] ?? null;
+    $imageUrl = $image ? asset('storage/' . $image) : Vite::asset('resources/images/gameplan-hero.png');
 @endphp
 
 <a href="{{ route('events.show', $event['id']) }}"
    class="group flex flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 transition hover:-translate-y-1 hover:border-violet-500/50">
 
     <div class="relative aspect-[16/9] overflow-hidden bg-zinc-800">
-        <img src="{{ asset($event['image']) }}" alt="" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
+        <img src="{{ $imageUrl }}" alt="" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
 
         <span class="absolute left-3 top-3 rounded-full bg-zinc-950/80 px-3 py-1 text-xs font-semibold text-violet-300 backdrop-blur">
             {{ $event['category'] }}

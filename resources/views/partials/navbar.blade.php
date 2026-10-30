@@ -3,7 +3,7 @@
 
         <!-- Logo -->
         <a href="/" class="flex items-center gap-2.5 text-2xl font-bold tracking-tight text-white">
-            <img src="{{ asset('favicon.svg') }}" alt="" class="size-8">
+            <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="" class="size-8">
             <span>Game<span class="text-violet-500">plan</span></span>
         </a>
 

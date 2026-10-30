@@ -9,12 +9,12 @@
         $cities = ['Delft', 'Rotterdam', 'Schiedam'];
 
         $events = [
-            ['id' => 1, 'title' => 'Friday Night Ranked', 'category' => 'Competitive', 'city' => 'Rotterdam', 'starts_at' => '2026-11-06 19:30', 'price' => 0, 'participants_count' => 8, 'is_cancelled' => false, 'image' => 'images/gameplan-hero.png'],
-            ['id' => 2, 'title' => 'Board Game Social', 'category' => 'Social', 'city' => 'Rotterdam', 'starts_at' => '2026-11-13 20:00', 'price' => 5, 'participants_count' => 14, 'is_cancelled' => false, 'image' => 'images/gameplan-hero.png'],
-            ['id' => 3, 'title' => 'Indie Co-op Evening', 'category' => 'Casual', 'city' => 'Delft', 'starts_at' => '2026-11-20 19:00', 'price' => 0, 'participants_count' => 6, 'is_cancelled' => false, 'image' => 'images/gameplan-hero.png'],
-            ['id' => 4, 'title' => 'Catan Tournament', 'category' => 'Tabletop', 'city' => 'Schiedam', 'starts_at' => '2026-11-22 14:00', 'price' => 7.5, 'participants_count' => 16, 'is_cancelled' => false, 'image' => 'images/gameplan-hero.png'],
-            ['id' => 5, 'title' => 'Retro LAN Weekend', 'category' => 'LAN party', 'city' => 'Rotterdam', 'starts_at' => '2026-11-28 12:00', 'price' => 15, 'participants_count' => 24, 'is_cancelled' => true, 'image' => 'images/gameplan-hero.png'],
-            ['id' => 6, 'title' => 'Fighting Game Friday', 'category' => 'Competitive', 'city' => 'Delft', 'starts_at' => '2026-12-04 19:00', 'price' => 0, 'participants_count' => 10, 'is_cancelled' => false, 'image' => 'images/gameplan-hero.png'],
+            ['id' => 1, 'title' => 'Friday Night Ranked', 'category' => 'Competitive', 'city' => 'Rotterdam', 'starts_at' => '2026-11-06 19:30', 'price' => 0, 'participants_count' => 8, 'is_cancelled' => false, 'image' => null],
+            ['id' => 2, 'title' => 'Board Game Social', 'category' => 'Social', 'city' => 'Rotterdam', 'starts_at' => '2026-11-13 20:00', 'price' => 5, 'participants_count' => 14, 'is_cancelled' => false, 'image' => null],
+            ['id' => 3, 'title' => 'Indie Co-op Evening', 'category' => 'Casual', 'city' => 'Delft', 'starts_at' => '2026-11-20 19:00', 'price' => 0, 'participants_count' => 6, 'is_cancelled' => false, 'image' => null],
+            ['id' => 4, 'title' => 'Catan Tournament', 'category' => 'Tabletop', 'city' => 'Schiedam', 'starts_at' => '2026-11-22 14:00', 'price' => 7.5, 'participants_count' => 16, 'is_cancelled' => false, 'image' => null],
+            ['id' => 5, 'title' => 'Retro LAN Weekend', 'category' => 'LAN party', 'city' => 'Rotterdam', 'starts_at' => '2026-11-28 12:00', 'price' => 15, 'participants_count' => 24, 'is_cancelled' => true, 'image' => null],
+            ['id' => 6, 'title' => 'Fighting Game Friday', 'category' => 'Competitive', 'city' => 'Delft', 'starts_at' => '2026-12-04 19:00', 'price' => 0, 'participants_count' => 10, 'is_cancelled' => false, 'image' => null],
         ];
     @endphp
 
