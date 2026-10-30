@@ -7,34 +7,8 @@
     'secondaryLabel' => 'Learn More',
     'secondaryHref' => '/events',
 
-    // Tijdelijke voorbeelddata. De keys volgen de kolommen uit de ERD (tabel events),
-    // zodat we dit later 1-op-1 kunnen vervangen door Event-models uit de database.
-    'events' => [
-        [
-            'title' => 'Friday Night Ranked',
-            'category' => 'Competitive',      // later: $event->category->name
-            'city' => 'Rotterdam',
-            'starts_at' => '2026-11-06 19:30',
-            'price' => 0,                     // 0 = gratis
-            'participants_count' => 8,        // later: telling uit event_user
-        ],
-        [
-            'title' => 'Board Game Social',
-            'category' => 'Social',
-            'city' => 'Rotterdam',
-            'starts_at' => '2026-11-13 20:00',
-            'price' => 5,
-            'participants_count' => 14,
-        ],
-        [
-            'title' => 'Indie Co-op Evening',
-            'category' => 'Casual',
-            'city' => 'Delft',
-            'starts_at' => '2026-11-20 19:00',
-            'price' => 0,
-            'participants_count' => 6,
-        ],
-    ],
+    // Eerstvolgende events (Event-models), meegegeven vanuit HomeController via home.blade.php
+    'events' => [],
 ])
 
 <section
@@ -101,34 +75,32 @@
             </div>
 
             <div class="grid gap-3 md:grid-cols-3">
-                @foreach ($events as $event)
-                    @php
-                        $startsAt = \Illuminate\Support\Carbon::parse($event['starts_at']);
-                    @endphp
+                @forelse ($events as $event)
+                    {{-- Elke kaart linkt naar de detailpagina van DAT event (route model binding) --}}
                     <a
-                        href="{{ $secondaryHref }}"
+                        href="{{ route('events.show', $event) }}"
                         class="group flex min-w-0 items-center gap-4 rounded-2xl border border-white/15 bg-zinc-950/55 p-4 shadow-xl shadow-black/25 backdrop-blur-xl transition hover:-translate-y-1 hover:border-violet-400/50 hover:bg-zinc-900/70"
                     >
                         <div class="flex size-14 shrink-0 flex-col items-center justify-center rounded-xl bg-violet-600 text-center text-white shadow-lg shadow-violet-950/30">
                             <span class="text-[0.65rem] font-bold uppercase leading-none tracking-wide">
-                                {{ $startsAt->format('j M') }}
+                                {{ $event->starts_at->format('j M') }}
                             </span>
                             <span class="pt-1 text-xs font-semibold text-violet-100">
-                                {{ $startsAt->format('H:i') }}
+                                {{ $event->starts_at->format('H:i') }}
                             </span>
                         </div>
 
                         <div class="min-w-0 flex-1">
                             <span class="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-violet-300">
-                                {{ $event['category'] }}
+                                {{ $event->category->name }}
                             </span>
                             <h3 class="truncate text-base font-semibold text-white group-hover:text-violet-200">
-                                {{ $event['title'] }}
+                                {{ $event->title }}
                             </h3>
                             <p class="truncate text-xs text-zinc-400">
-                                {{ $event['city'] }}
-                                · {{ $event['participants_count'] }} players
-                                · {{ $event['price'] == 0 ? 'Free' : '€' . number_format($event['price'], 2, ',', '.') }}
+                                {{ $event->city }}
+                                · {{ $event->participants_count }} {{ Str::plural('player', $event->participants_count) }}
+                                · {{ $event->price == 0 ? 'Free' : '€' . number_format($event->price, 2, ',', '.') }}
                             </p>
                         </div>
 
@@ -136,7 +108,11 @@
                             →
                         </span>
                     </a>
-                @endforeach
+                @empty
+                    <p class="rounded-2xl border border-white/15 bg-zinc-950/55 p-4 text-sm text-zinc-300 backdrop-blur-xl md:col-span-3">
+                        No upcoming events yet. Be the first to <a href="{{ route('events.create') }}" class="font-semibold text-violet-300 hover:text-violet-200">organize one</a>!
+                    </p>
+                @endforelse
             </div>
         </div>
     </div>

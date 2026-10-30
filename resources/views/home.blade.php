@@ -3,5 +3,6 @@
 @section('title', 'Gameplan')
 
 @section('content')
-    <x-hero />
+    {{-- $upcomingEvents komt uit HomeController@index --}}
+    <x-hero :events="$upcomingEvents" />
 @endsection

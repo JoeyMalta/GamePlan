@@ -5,6 +5,32 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## 2026-10-30
+
+### Added
+- **Seeder** (`DatabaseSeeder`): 5 categories, demo accounts (admin, Sam with 3 login days, Lisa with only 1 login day), 5 events and participants. `php artisan migrate:fresh --seed` gives a clean demo database.
+- `event_images` table + `EventImage` model (`hasMany` on `Event`), so an event can have up to 5 location photos.
+- **Events overview** (`EventController@index`): search on title/description (grouped `orWhere` in a closure) and filters on city, category and free/paid. Uses eager loading (`with`, `withCount`) to avoid the N+1 problem.
+- **Event detail** (`show`) with route model binding (missing or soft-deleted events give a 404).
+- **Create event** (`create`/`store`) with required-field validation, image upload (`storePublicly` on the `public` disk) and the *deeper validation* check: only users who logged in on 3 different days (or admins) may create events, otherwise `abort(403)`.
+- **Edit / delete event** (`edit`/`update`/`destroy`): only the organizer or an admin (`authorizeOwnerOrAdmin`), photos can be removed, delete is a soft delete.
+- **Join / leave events** (`join`/`leave`) with `attach()` and `detach()` on the `event_user` pivot table; not possible for cancelled or past events, and not twice.
+- **Admin middleware** `EnsureUserIsAdmin` (alias `admin`); all `/admin` routes use `auth` + `admin`, other users get a 403.
+- **Admin controllers** (`Admin\UserController`, `Admin\EventController`) with status toggles via POST: activate/deactivate a user (`toggleActive`, an admin can't deactivate himself) and cancel/reinstate an event (`toggleCancelled`).
+- **DashboardController**: "Events I organize" (1-to-many) and "Events I'm joining" (many-to-many) with real data.
+- `docs/demo-accounts.xlsx` with the demo login details.
+
+### Changed
+- Deactivated users (`is_active = false`) can no longer log in: checked in `LoginRequest::authenticate()` right after `Auth::attempt()`, then logged out with an error message.
+- All views now use Eloquent models and named routes instead of sample arrays and `Route::view()`.
+- The 403 page shows the message from `abort(403, '...')`, with a general text as fallback.
+
+### Security
+- Broken Access Control (OWASP A01): admin routes behind the `admin` middleware, owner/admin check in the controller for edit/update/delete, and server-side checks for join/leave (a hidden button is not security).
+- Status toggles use POST forms with `@csrf` instead of GET links, so data is never changed by just opening a URL.
+
+## 2026-10-29 / 30 (front-end & cleanup)
+
 ### Added
 - Admin events list now has **Edit** and **Delete** buttons per row next to the status toggle (like the example in the assignment).
 - Admins can edit and delete any event from the event detail page (moderator role); organizers can still only manage their own events.
