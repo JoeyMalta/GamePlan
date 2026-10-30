@@ -46,6 +46,9 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        // Registreren telt als eerste inlogdag (Auth::login gaat niet via AuthenticatedSessionController)
+        $user->logins()->create();
+
         return redirect(route('dashboard', absolute: false));
     }
 }

@@ -12,9 +12,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Eigen middleware registreren onder de naam 'admin', zodat je in routes ->middleware('admin') kunt schrijven
+        // Eigen middleware registreren onder de naam 'admin', zodat je in routes middleware('admin') kunt schrijven
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+        ]);
+
+        // Draait bij ELK web-verzoek: een gedeactiveerde gebruiker wordt direct uitgelogd
+        $middleware->web(append: [
+            \App\Http\Middleware\EnsureUserIsActive::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

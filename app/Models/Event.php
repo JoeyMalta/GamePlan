@@ -25,7 +25,8 @@ class Event extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        // withTrashed: ook een (soft) verwijderde maker blijft gekoppeld aan zijn events
+        return $this->belongsTo(User::class)->withTrashed();
     }
 
     public function category(): BelongsTo

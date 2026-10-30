@@ -50,7 +50,13 @@ class ProfileController extends Controller
 
         Auth::logout();
 
-        $user->delete();
+        // Zijn toekomstige events gaan niet meer door → afzeggen (deelnemers zien de banner).
+        // Voorbije events blijven ongewijzigd, zodat de geschiedenis klopt.
+        $user->events()
+            ->where('starts_at', '>', now())
+            ->update(['is_cancelled' => true]);
+
+        $user->delete();   // soft delete (SoftDeletes in het User-model)
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

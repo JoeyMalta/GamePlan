@@ -3,9 +3,12 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Models\Event;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
 
 class DatabaseSeeder extends Seeder
 {
@@ -105,9 +108,35 @@ class DatabaseSeeder extends Seeder
         $lan->is_cancelled = true;
         $lan->save();
 
-        // 5. Deelnemers (veel-op-veel via event_user)
+        // 5. Foto's per event (bestanden staan in database/seeders/images)
+        $this->attachImage($ranked, 'FridayNightRanked.png');
+        $this->attachImage($boardGames, 'BoardGameSocial.png');
+        $this->attachImage($coop, 'IndieCo-opEvent.png');
+        $this->attachImage($catan, 'CatanTournament.png');
+        $this->attachImage($lan, 'RetroLan.png');
+
+        // 6. Deelnemers (veel-op-veel via event_user)
         $ranked->participants()->attach([$lisa->id, $admin->id]);
         $boardGames->participants()->attach([$lisa->id]);
         $coop->participants()->attach([$sam->id, $lisa->id]);
+    }
+
+    /**
+     * Kopieert een foto naar storage/app/public/events en slaat het pad op in event_images.
+     * Precies wat er bij een echte upload gebeurt (EventController::storeImages), maar dan vanuit een map.
+     * Ontbreekt het bestand? Dan slaan we het over en toont de site de standaardafbeelding.
+     */
+    private function attachImage(Event $event, string $fileName): void
+    {
+        $source = database_path('seeders/images/' . $fileName);
+
+        if (! file_exists($source)) {
+            return;
+        }
+
+        // putFile geeft het bestand een unieke naam en geeft het pad terug, bijv. "events/abc123.jpg"
+        $path = Storage::disk('public')->putFile('events', new File($source));
+
+        $event->images()->create(['path' => $path]);
     }
 }
