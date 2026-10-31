@@ -5,6 +5,22 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## 2026-10-30 – Deployment to Laravel Cloud
+
+### Added
+- **Production environment on Laravel Cloud** (EU Central, Frankfurt): https://gameplan-production-jnboci.laravel.cloud
+  - MySQL 8.4 database (Dev size, scale to zero) instead of the local SQLite file.
+  - Laravel Object Storage bucket, connected as the `public` disk, for uploaded event photos.
+  - Environment variables per environment: `APP_ENV=production`, `APP_DEBUG=false`, `APP_TIMEZONE=Europe/Amsterdam`; database and bucket credentials are injected by Cloud and never stored in Git.
+  - Spending limit set so the trial cannot cost more than the free credits.
+- `league/flysystem-aws-s3-v3` (`^3.35`), the S3 driver Laravel needs to write to the bucket. Added locally with Composer and committed in `composer.lock`, so every environment installs the same versions.
+
+### Fixed
+- **500 error on every page after the first deploy:** `SESSION_DRIVER` and `CACHE_STORE` use the database, which did not exist yet. Fixed by attaching the MySQL database and running `php artisan migrate --force`.
+- **Event photo URLs:** views used `asset('storage/' . $path)`, which only works with the local `storage:link` folder. Changed to `Storage::disk('public')->url($path)`, which gives `/storage/...` locally and the bucket URL in production.
+- **Seeder crashed in production** (`Call to undefined function fake()`): the `UserFactory` uses Faker, which is a dev dependency and is not installed with `composer install --no-dev`. Demo accounts are now created with `User::forceCreate()` in the seeder.
+- **`Unable to locate file in Vite manifest: resources/images/logo.svg`** (logo and hero image): locally `npm run dev` works without a manifest, but in production `npm run build` is used. Vite 8 removed the unused `import.meta.glob(['../images/**'])` from the build, so the images were missing from `public/build/manifest.json`. `resources/js/app.js` now keeps the result (`eager` + `?url`), and the fix was verified locally with `npm run build` before deploying.
+
 ## 2026-10-30
 
 ### Added
@@ -19,11 +35,22 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Admin controllers** (`Admin\UserController`, `Admin\EventController`) with status toggles via POST: activate/deactivate a user (`toggleActive`, an admin can't deactivate himself) and cancel/reinstate an event (`toggleCancelled`).
 - **DashboardController**: "Events I organize" (1-to-many) and "Events I'm joining" (many-to-many) with real data.
 - `docs/demo-accounts.xlsx` with the demo login details.
+- **HomeController**: the homepage shows the next 3 upcoming events (not cancelled, ordered by date) and each card links to its own event page.
+- Middleware `EnsureUserIsActive`, added to the `web` group: a user who is deactivated while logged in is logged out on the next request.
+- Each demo event gets its own photo from `database/seeders/images` (photos from Unsplash), stored the same way as an upload.
+- `docs/gameplan-erd.dbml` (source of the ERD) added to the repository.
 
 ### Changed
 - Deactivated users (`is_active = false`) can no longer log in: checked in `LoginRequest::authenticate()` right after `Auth::attempt()`, then logged out with an error message.
 - All views now use Eloquent models and named routes instead of sample arrays and `Route::view()`.
 - The 403 page shows the message from `abort(403, '...')`, with a general text as fallback.
+- Registering now counts as the first login day (`Auth::login()` after registration does not go through `AuthenticatedSessionController`).
+- `Event::user()` uses `withTrashed()`, so an event still shows its organizer after that account is (soft) deleted.
+- When a user deletes their account, their upcoming events are cancelled; past events stay unchanged.
+- The navbar uses `isAdmin()` for the admin link, like the rest of the code.
+
+### Fixed
+- The delete-account modal was covered by its own backdrop in Tailwind 4; the modal panel now has `relative z-10`.
 
 ### Security
 - Broken Access Control (OWASP A01): admin routes behind the `admin` middleware, owner/admin check in the controller for edit/update/delete, and server-side checks for join/leave (a hidden button is not security).
