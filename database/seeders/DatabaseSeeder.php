@@ -102,7 +102,7 @@ class DatabaseSeeder extends Seeder
         // 5. Foto's per event (bestanden staan in database/seeders/images)
         $this->attachImage($ranked, 'FridayNightRanked.png');
         $this->attachImage($boardGames, 'BoardGameSocial.png');
-        $this->attachImage($coop, 'IndieCo-opEvent.png');
+        $this->attachImage($coop, 'IndieCo-opEvent.jpg');
         $this->attachImage($catan, 'CatanTournament.png');
         $this->attachImage($lan, 'RetroLan.png');
 
