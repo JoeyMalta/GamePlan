@@ -1,7 +1,11 @@
 # Gameplan
 
-> **TODO (Joey): schrijf hier in je eigen woorden 3–5 zinnen over Gameplan.**
-> Bijvoorbeeld: wat is het, voor wie is het, en waarom heb je dit onderwerp gekozen.
+Gameplan is een website waar gepassioneerde game developers in Nederland events op kunnen zetten om mensen met
+dezelfde mindset te ontmoeten. Dit doen ze door leuke events te organiseren waar mensen lekker kunnen socializen,
+zonder de druk van industrie-events. Gebruikers kunnen zich aanmelden voor een opkomend event. Zo is het voor de
+organisatoren duidelijk met hoeveel mensen ze rekening moeten houden.
+
+**Live:** https://gameplan-production-jnboci.laravel.cloud
 
 Schoolproject voor CMTPRG02-5 *Web Application Frameworks* (Hogeschool Rotterdam), gebouwd met Laravel.
 
@@ -72,5 +76,36 @@ Zie [CHANGELOG.md](CHANGELOG.md).
 
 ## AI-gebruik
 
-> **TODO (Joey): beschrijf hier zelf, eerlijk en concreet, waarvoor je AI hebt gebruikt.**
-> De cursushandleiding vraagt hierover transparantie. Noem bijvoorbeeld welke onderdelen je met hulp van AI hebt gemaakt, wat je zelf hebt geschreven, en hoe je hebt gecontroleerd dat je alles begrijpt.
+Bij dit project heb ik Claude (Anthropic) gebruikt, via de Claude-app (Cowork).
+Ik heb het op twee manieren ingezet:
+
+### 1. Front-end (HTML / CSS / Tailwind)
+De views en de styling in GamePlan-stijl (donker + violet) zijn grotendeels door
+Claude gegenereerd. Dit mocht volgens de cursushandleiding. Het gaat om de
+Blade-views in `resources/views` (layout, navbar, hero, event-cards, formulieren,
+admin-pagina's, dashboard, 403/404-pagina's). Ik heb de structuur en de inhoud
+bepaald (welke pagina's, welke velden, MeetUp als voorbeeld) en de views daarna
+aangepast en gekoppeld aan echte data.
+
+### 2. Back-end (Laravel): Claude als mentor
+Voor de back-end heb ik Claude gebruikt als uitleg- en reviewhulp:
+- uitleg van Laravel-concepten (migrations, Eloquent-relaties, route model binding,
+  middleware, validatie, `attach`/`detach`)
+- het ERD-ontwerp samen doorlopen (1-op-veel en veel-op-veel, pivot `event_user`)
+- feedback op mijn code en hulp bij foutmeldingen die kwamen door gebroken Herd installaties of NPM bugs
+- bijv. de EventController, de admin-controllers en de middleware heeft
+  Claude code voorgesteld omdat laracast niet mijn specifieke situatie had. 
+  Die heb ik doorgenomen, laten uitleggen en waar nodig aangepast.
+  De migrations, models, en relaties heb ik zelf geschreven.
+
+### Hoe ik heb gecontroleerd dat ik het begrijp
+- elke stap laten uitleggen voordat ik commitde; de demo doorlopen met de
+  drie demo-accounts; feature tests geschreven voor de 3-dagenregel en de autorisatie
+
+### Wat ik zelf heb bepaald
+- De keuze voor het onderwerp (GamePlan, gebaseerd op MeetUp) en de features op de site.
+- De diepere validatie: eerst inloggen op 3 verschillende dagen, geteld met een
+  losse Eloquent-query op de `logins`-tabel
+- meerdere foto's via `event_images` om de site wat complexer te maken
+- deployment naar Laravel Cloud voor extra punt.
+- soft deletes, `restrictOnDelete` gekozen na uitleg (en de tip van Antwan om events niet zomaar te verwijderen)
