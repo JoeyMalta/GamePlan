@@ -35,6 +35,18 @@ npm run build
 
 Daarna draait de site via Laravel Herd (bijvoorbeeld `https://gameplan.test`) of met `php artisan serve`.
 
+## Productie (OTAP)
+
+De live-versie draait op Laravel Cloud. Verschillen met lokaal staan in de `.env`
+(die niet in git staat):
+
+- `APP_ENV=production` en `APP_DEBUG=false` (geen foutdetails voor bezoekers)
+- eigen database: MySQL
+- foto-uploads op S3-objectopslag in plaats van de lokale `public`-disk
+
+Bij een deployment draait: `composer install --no-dev`, `npm run build`
+en `php artisan migrate --force`.
+
 ## Demo-accounts
 
 Alle accounts hebben het wachtwoord `password`.
@@ -81,7 +93,7 @@ Ik heb het op twee manieren ingezet:
 
 ### 1. Front-end (HTML / CSS / Tailwind)
 De views en de styling in GamePlan-stijl (donker + violet) zijn grotendeels door
-Claude gegenereerd. Dit mocht volgens de cursushandleiding. Het gaat om de
+Claude gegenereerd. Dit was met Antwan afgestemd. Het gaat om de
 Blade-views in `resources/views` (layout, navbar, hero, event-cards, formulieren,
 admin-pagina's, dashboard, 403/404-pagina's). Ik heb de structuur en de inhoud
 bepaald (welke pagina's, welke velden, MeetUp als voorbeeld) en de views daarna
@@ -97,10 +109,12 @@ Voor de back-end heb ik Claude gebruikt als uitleg- en reviewhulp:
   Claude code voorgesteld omdat laracast niet mijn specifieke situatie had. 
   Die heb ik doorgenomen, laten uitleggen en waar nodig aangepast.
   De migrations, models, en relaties heb ik zelf geschreven.
+- De CHANGELOG en de opzet van deze README zijn met hulp van Claude geschreven.
 
 ### Hoe ik heb gecontroleerd dat ik het begrijp
-- elke stap laten uitleggen voordat ik commitde; de demo doorlopen met de
-  drie demo-accounts; feature tests geschreven voor de 3-dagenregel en de autorisatie
+   - elke stap laten uitleggen voordat ik committe
+   - alles handmatig getest met de drie demo-accounts (403 bij deeplinks, deactiveren, de 3-dagenregel)
+   - Screenshots van leermomenten (eigen code, fouten en uitleg) staan in de map `ai_Logs`. De volledige chatlogs heb ik bewaard en kan ik op verzoek laten zien.
 
 ### Wat ik zelf heb bepaald
 - De keuze voor het onderwerp (GamePlan, gebaseerd op MeetUp) en de features op de site.
