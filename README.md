@@ -110,6 +110,7 @@ Voor de back-end heb ik Claude gebruikt als uitleg- en reviewhulp:
   Die heb ik doorgenomen, laten uitleggen en waar nodig aangepast.
   De migrations, models, en relaties heb ik zelf geschreven.
 - De CHANGELOG en de opzet van deze README zijn met hulp van Claude geschreven.
+- Ik heb claude ook netjes comments laten maken voor mijn code zodat alles leesbaar en duidelijk bleef voor de komende dagen.
 
 ### Hoe ik heb gecontroleerd dat ik het begrijp
    - elke stap laten uitleggen voordat ik committe
